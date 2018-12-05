@@ -1,5 +1,6 @@
 % Simple Linear Advection Equation solver using SBP
 
+% bc_method : boundary condition method ('sat', 'proj', 'ipm')
 % n : grid size [0:1]
 % tf : final time
 % u_init : initial condition
