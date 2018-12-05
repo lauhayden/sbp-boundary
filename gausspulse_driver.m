@@ -7,17 +7,31 @@ n = 200;
 tf = 0.5;
 sigma = 0.1;
 center = 0.3;
+h = 1 / n;
 
 x = linspace(0, 1, n);
 u_init = exp(-((x - center) / sigma).^2);
 
-[t, y] = linadv_solve('ipm', n, tf, u_init, @D1_6, @input_boundary, @input_boundary_t);
+[t, y1] = linadv_solve('sat', n, tf, u_init, @D1_6, @input_boundary, @input_boundary_t, 1/h);
+[t, y2] = linadv_solve('proj', n, tf, u_init, @D1_6, @input_boundary, @input_boundary_t, 1/h);
+[t, y3] = linadv_solve('ipm', n, tf, u_init, @D1_6, @input_boundary, @input_boundary_t, 1/h);
 
-plot(x, y(1, :))
+subplot(2, 2, 1)
+plot(x, y1(1, :))
 axis([0, 1, -0.1, 1.1])
-figure
-plot(x, y(end, :))
+title('Initial Condition')
+subplot(2, 2, 2)
+plot(x, y1(end, :))
 axis([0, 1, -0.1, 1.1])
+title('SBP-SAT')
+subplot(2, 2, 3)
+plot(x, y2(end, :))
+axis([0, 1, -0.1, 1.1])
+title('SBP-Proj')
+subplot(2, 2, 4)
+plot(x, y3(end, :))
+axis([0, 1, -0.1, 1.1])
+title('SBP-IPM')
 
 function x0 = input_boundary(t)
     x0_center = 0.25;
