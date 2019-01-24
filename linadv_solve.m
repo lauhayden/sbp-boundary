@@ -14,6 +14,7 @@ function [t, u] = linadv_solve(bc_method, n, tf, u_init, D1_func, u0_func, u0_t_
     % scale SBP operator to grid size
     H = H / n;
     D1 = D1 * n;
+    D1 = sparse(D1);
     
     % precalculate element 1, 1 of inv(H)
     invH = inv(H);
