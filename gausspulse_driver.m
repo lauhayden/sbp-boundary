@@ -8,6 +8,13 @@ tf = 0.5;
 sigma = 0.05;
 center = 0.25;
 
+H = cell(length(n_values), 1);
+
+for i=1:length(n_values)
+    [H_n, D1] = D1_6(n_values(i));
+    H{i} = H_n / n_values(i);
+end
+
 y_sat = cell(length(n_values), 1);
 y_proj = cell(length(n_values), 1);
 y_ipm = cell(length(n_values), 1);
@@ -49,9 +56,12 @@ error_norms_ipm = zeros(length(n_values), 1);
 for i=1:length(n_values)
     n = n_values(i);
     solution = exact_solution(tf, n);
-    error_norms_sat(i) = norm(solution - y_sat{i}(end, :));
-    error_norms_proj(i) = norm(solution - y_proj{i}(end, :));
-    error_norms_ipm(i) = norm(solution - y_proj{i}(end, :));
+    error_sat = solution - y_sat{i}(end, :);
+    error_proj = solution - y_proj{i}(end, :);
+    error_ipm = solution - y_ipm{i}(end, :);
+    error_norms_sat(i) = sqrt(error_sat * H{i} * error_sat');
+    error_norms_proj(i) = sqrt(error_proj * H{i} * error_proj');
+    error_norms_ipm(i) = sqrt(error_ipm * H{i} * error_ipm');
 end
 
 figure
