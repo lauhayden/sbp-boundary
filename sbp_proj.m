@@ -1,3 +1,4 @@
-function dydt = sbp_proj(t, y, P, D1, u0_t_func, e0)
-    dydt = -P * D1 * y + u0_t_func(t) * e0;
+function dydt = sbp_proj(t, y, D1, u0_t_func)
+    dydt = -D1 * y;
+    dydt(1) = u0_t_func(t);
 end

@@ -3,7 +3,7 @@
 
 close all
 
-n_values = [100, 200];
+n_values = [100, 200, 500];
 tf = 0.5;
 sigma = 0.05;
 center = 0.25;

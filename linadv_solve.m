@@ -18,19 +18,13 @@ function [t, u] = linadv_solve(bc_method, n, tf, u_init, D1_func, u0_func, u0_t_
     % precalculate element 1, 1 of inv(H)
     invH = inv(H);
     invH_11 = invH(1, 1);
-    
-    % precalc other vectors and matrices
-    e0 = zeros(n, 1);
-    e0(1) = 1;
-    L = e0;
-    P = eye(n) - invH * L * inv(L' * invH * L) * L';
 
     if bc_method == "sat"
-        [t, u] = ode45(@(t, y) sbp_sat(t, y, D1, u0_func, invH_11, e0), [0, tf], u_init);
+        [t, u] = ode45(@(t, y) sbp_sat(t, y, D1, u0_func, invH_11), [0, tf], u_init);
     elseif bc_method == "proj"
-        [t, u] = ode45(@(t, y) sbp_proj(t, y, P, D1, u0_t_func, e0), [0, tf], u_init);
+        [t, u] = ode45(@(t, y) sbp_proj(t, y, D1, u0_t_func), [0, tf], u_init);
     elseif bc_method == "ipm"
-        [t, u] = ode45(@(t, y) sbp_ipm(t, y, P, D1, u0_func, e0, u0_t_func, sigma), [0, tf], u_init);
+        [t, u] = ode45(@(t, y) sbp_ipm(t, y, D1, u0_func, u0_t_func, sigma), [0, tf], u_init);
     else
         error('bc_method not recognized')
     end
