@@ -9,7 +9,7 @@
 % u0_t_func : time derivative of boundary condition at x=0
 
 function [t, u] = linadv_solve(bc_method, n, tf, u_init, D1_func, u0_func, u0_t_func, sigma)
-    [H, D1] = D1_func(n);
+    [H, D1] = D1_func(n + 1);
     
     % scale SBP operator to grid size
     H = H / n;
