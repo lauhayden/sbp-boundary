@@ -5,18 +5,20 @@ close all
 
 % setup params
 n = [100, 200, 500, 1000];
-tf = 0.5;
+tf = 0.25;
 igauss_on = true;
 igauss_sigma = 0.05;
-igauss_center = 0.25;
-bgauss_on = true;
+igauss_center = 0.5;
+bgauss_on = false;
 bgauss_sigma = 0.05;
 bgauss_center = -0.25;
+sbp_operator = @D1_6;
+solver = @ode45;
 
 % construct H for H-norm
 H = cell(length(n), 1);
 for i=1:length(n)
-    [H_n, D1] = D1_6(n(i) + 1);
+    [H_n, D1] = sbp_operator(n(i) + 1);
     H{i} = H_n / n(i);
 end
 
@@ -73,12 +75,12 @@ for i=1:length(n)
     input_boundary_t_l = @(t) input_boundary_t(t, bgauss_on, bgauss_center, bgauss_sigma);
     
     % solve
-    [t_sat_l, y_sat_l] = linadv_solve('sat', n_l, tf, u_init_l, ...
-        @D1_6, input_boundary_l, input_boundary_t_l, n_l); % CHECK SIGMA VAL
-    [t_proj_l, y_proj_l] = linadv_solve('proj', n_l, tf, u_init_l, ...
-        @D1_6, input_boundary_l, input_boundary_t_l, n_l);
-    [t_ipm_l, y_ipm_l] = linadv_solve('ipm', n_l, tf, u_init_l, ...
-        @D1_6, input_boundary_l, input_boundary_t_l, n_l);
+    [t_sat_l, y_sat_l] = linadv_solve(solver, 'sat', n_l, tf, u_init_l, ...
+        sbp_operator, input_boundary_l, input_boundary_t_l, n_l); % CHECK SIGMA VAL
+    [t_proj_l, y_proj_l] = linadv_solve(solver, 'proj', n_l, tf, u_init_l, ...
+        sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
+    [t_ipm_l, y_ipm_l] = linadv_solve(solver, 'ipm', n_l, tf, u_init_l, ...
+        sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
     
     % store in cells
     y_sat(i) = {y_sat_l};
