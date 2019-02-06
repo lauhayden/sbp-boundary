@@ -5,11 +5,11 @@ close all
 
 % setup params
 n = [100, 200, 500, 1000];
-tf = 0.25;
+tf = 0.5;
 igauss_on = true;
 igauss_sigma = 0.05;
-igauss_center = 0.5;
-bgauss_on = false;
+igauss_center = 0.25;
+bgauss_on = true;
 bgauss_sigma = 0.05;
 bgauss_center = -0.25;
 sbp_operator = @D1_6;
@@ -24,9 +24,9 @@ end
 
 % make cell arrays
 % computed solutions
-y_sat = cell(length(n), 1);
-y_proj = cell(length(n), 1);
-y_ipm = cell(length(n), 1);
+u_sat = cell(length(n), 1);
+u_proj = cell(length(n), 1);
+u_ipm = cell(length(n), 1);
 % computed times
 t_sat = cell(length(n), 1);
 t_proj = cell(length(n), 1);
@@ -83,9 +83,9 @@ for i=1:length(n)
         sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
     
     % store in cells
-    y_sat(i) = {y_sat_l};
-    y_proj(i) = {y_proj_l};
-    y_ipm(i) = {y_ipm_l};
+    u_sat(i) = {y_sat_l};
+    u_proj(i) = {y_proj_l};
+    u_ipm(i) = {y_ipm_l};
 end
 
 % calc errors
@@ -94,9 +94,9 @@ for i=1:length(n)
     solution_l = solution{i};
     
     % errors
-    e_sat_l = solution_l - y_sat{i}(end, :)';
-    e_proj_l = solution_l - y_proj{i}(end, :)';
-    e_ipm_l = solution_l - y_ipm{i}(end, :)';
+    e_sat_l = solution_l - u_sat{i}(end, :)';
+    e_proj_l = solution_l - u_proj{i}(end, :)';
+    e_ipm_l = solution_l - u_ipm{i}(end, :)';
     
     % error norms
     enorm_sat(i) = sqrt(e_sat_l' * H{i} * e_sat_l);
@@ -120,46 +120,59 @@ enormreg_ipm = A_slope \ log10(enorm_ipm);
 
 % plot final solutions together
 subplot(2, 2, 1)
-plot(x{1}, y_sat{1}(1, :)')
+plot(x{1}, u_sat{1}(1, :)')
 axis([0, 1, -0.1, 1.1])
 title('Initial Condition')
+xlabel('x')
 subplot(2, 2, 2)
-plot(x{1}, y_sat{1}(end, :)')
+plot(x{1}, u_sat{1}(end, :)')
 axis([0, 1, -0.1, 1.1])
 title('SBP-SAT')
+xlabel('x')
 subplot(2, 2, 3)
-plot(x{1}, y_proj{1}(end, :)')
+plot(x{1}, u_proj{1}(end, :)')
 axis([0, 1, -0.1, 1.1])
 title('SBP-Proj')
+xlabel('x')
 subplot(2, 2, 4)
-plot(x{1}, y_ipm{1}(end, :)')
+plot(x{1}, u_ipm{1}(end, :)')
 axis([0, 1, -0.1, 1.1])
 title('SBP-IPM')
+xlabel('x')
 
 % plot error norms
 figure
 subplot(2, 2, 2)
 loglog(n, enorm_sat, 'o-')
 title('SBP-SAT Error')
+ylabel('H-norm of error')
+xlabel('1/h')
 subplot(2, 2, 3)
 loglog(n, enorm_proj, 'o-')
 title('SBP-Proj Error')
+ylabel('H-norm of error')
+xlabel('1/h')
 subplot(2, 2, 4)
 loglog(n, enorm_ipm, 'o-')
 title('SBP-IPM Error')
+ylabel('H-norm of error')
+xlabel('1/h')
 
 % plot exact solution overlaid
 figure
 hold on
 plot(x{4}, solution{4}, 'o')
-plot(x{4}, y_sat{4}(end, :)', 'o')
+plot(x{4}, u_sat{4}(end, :)', 'o')
 
 % plot errors
 figure
 hold on
 for i=1:length(n)
-    plot(x{i}, solution{i} - y_sat{i}(end, :)')
+    plot(x{i}, solution{i} - u_sat{i}(end, :)')
 end
+title('Error at tf')
+ylabel('u_exact - u_sbp_sat')
+xlabel('x')
 
 %% Inline functions
 
