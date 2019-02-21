@@ -92,6 +92,9 @@ for i=1:length(n)
     u_sat(i) = {y_sat_l};
     u_proj(i) = {y_proj_l};
     u_ipm(i) = {y_ipm_l};
+    t_sat(i) = {t_sat_l};
+    t_proj(i) = {t_proj_l};
+    t_ipm(i) = {t_ipm_l};
 end
 
 % calc errors
@@ -181,14 +184,14 @@ title('Error at tf')
 ylabel('u\_exact - u\_sbp\_sat')
 xlabel('x')
 
-figure
-hold on
-for i=1:length(n)
-    plot(x{i}, solution{i} - u_proj{i}(end, :)')
-end
-title('Error at tf')
-ylabel('u\_exact - u\_sbp\_proj')
-xlabel('x')
+% figure
+% hold on
+% for i=1:length(n)
+%     plot(x{i}, solution{i} - u_proj{i}(end, :)')
+% end
+% title('Error at tf')
+% ylabel('u\_exact - u\_sbp\_proj')
+% xlabel('x')
 
 % plot boundary overlaid with exact
 % t_boundary = linspace(0, 0.5, 501);

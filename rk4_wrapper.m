@@ -3,6 +3,6 @@ function [t, u] = rk4_wrapper(odefun, tspan, y0, h)
     u = zeros(length(t), length(y0));
     u(1, :) = y0;
     for i=2:length(t)
-        u(i, :) = rk4(h, odefun, t(i), u(i-1, :)');
+        u(i, :) = rk4(h, odefun, t(i-1), u(i-1, :)');
     end
 end
