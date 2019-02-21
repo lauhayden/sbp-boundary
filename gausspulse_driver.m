@@ -13,7 +13,8 @@ bgauss_on = true;
 bgauss_sigma = 0.05;
 bgauss_center = -0.25;
 sbp_operator = @D1_6;
-solver = @ode45;
+solver = @rk4_wrapper;
+%h = 0.0001;
 
 % construct H for H-norm
 H = cell(length(n), 1);
@@ -49,7 +50,12 @@ end
 % initial condition
 u_init = cell(length(n), 1);
 for i=1:length(n)
-    u_init(i) = {exp(-((x{i} - igauss_center) / igauss_sigma).^2)};
+    if igauss_on
+        u_init_l = exp(-((x{i} - igauss_center) / igauss_sigma).^2);
+    else
+        u_init_l = zeros(size(x{i}));
+    end
+    u_init(i) = {u_init_l};
 end
 
 % exact solution
@@ -76,7 +82,7 @@ for i=1:length(n)
     
     % solve
     [t_sat_l, y_sat_l] = linadv_solve(solver, 'sat', n_l, tf, u_init_l, ...
-        sbp_operator, input_boundary_l, input_boundary_t_l, n_l); % CHECK SIGMA VAL
+        sbp_operator, input_boundary_l, input_boundary_t_l, n_l); % TODO: CHECK SIGMA VAL
     [t_proj_l, y_proj_l] = linadv_solve(solver, 'proj', n_l, tf, u_init_l, ...
         sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
     [t_ipm_l, y_ipm_l] = linadv_solve(solver, 'ipm', n_l, tf, u_init_l, ...
@@ -159,10 +165,11 @@ ylabel('H-norm of error')
 xlabel('1/h')
 
 % plot exact solution overlaid
-figure
-hold on
-plot(x{4}, solution{4}, 'o')
-plot(x{4}, u_sat{4}(end, :)', 'o')
+% figure
+% hold on
+% plot(x{4}, solution{4}, 'o')
+% plot(x{4}, u_sat{4}(end, :)', 'o')
+% legend('exact', 'sat4')
 
 % plot errors
 figure
@@ -171,8 +178,24 @@ for i=1:length(n)
     plot(x{i}, solution{i} - u_sat{i}(end, :)')
 end
 title('Error at tf')
-ylabel('u_exact - u_sbp_sat')
+ylabel('u\_exact - u\_sbp\_sat')
 xlabel('x')
+
+figure
+hold on
+for i=1:length(n)
+    plot(x{i}, solution{i} - u_proj{i}(end, :)')
+end
+title('Error at tf')
+ylabel('u\_exact - u\_sbp\_proj')
+xlabel('x')
+
+% plot boundary overlaid with exact
+% t_boundary = linspace(0, 0.5, 501);
+% y_boundary = input_boundary(t_boundary, true, bgauss_center, bgauss_sigma);
+% figure
+% hold on
+% plot(x{4}(1:501), solution{4}(1:501) - y_boundary')
 
 %% Inline functions
 

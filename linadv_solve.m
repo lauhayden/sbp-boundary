@@ -20,12 +20,14 @@ function [t, u] = linadv_solve(odesolve, bc_method, n, tf, u_init, D1_func, u0_f
     invH = inv(H);
     invH_11 = invH(1, 1);
 
+    %options = odeset('RelTol', 1, 'AbsTol', 1);
+    h = 0.00001;
     if bc_method == "sat"
-        [t, u] = odesolve(@(t, y) sbp_sat(t, y, D1, u0_func, invH_11), [0, tf], u_init);
+        [t, u] = odesolve(@(t, y) sbp_sat(t, y, D1, u0_func, invH_11), [0, tf], u_init, h);
     elseif bc_method == "proj"
-        [t, u] = odesolve(@(t, y) sbp_proj(t, y, D1, u0_t_func), [0, tf], u_init);
+        [t, u] = odesolve(@(t, y) sbp_proj(t, y, D1, u0_t_func), [0, tf], u_init, h);
     elseif bc_method == "ipm"
-        [t, u] = odesolve(@(t, y) sbp_ipm(t, y, D1, u0_func, u0_t_func, sigma), [0, tf], u_init);
+        [t, u] = odesolve(@(t, y) sbp_ipm(t, y, D1, u0_func, u0_t_func, sigma), [0, tf], u_init, h);
     else
         error('bc_method not recognized')
     end
