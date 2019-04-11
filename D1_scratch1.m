@@ -1,3 +1,6 @@
+% From-scratch implementation of a first-order accurate SBP operator
+% mostly for debugging purposes
+
 function [H, D1] = D1_scratch1(n)
     H = eye(n);
     H(1, 1) = 0.5;

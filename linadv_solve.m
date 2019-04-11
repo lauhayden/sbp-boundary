@@ -20,7 +20,7 @@ function [t, u] = linadv_solve(odesolve, bc_method, n, tf, u_init, D1_func, u0_f
     invH = inv(H);
     invH_11 = invH(1, 1);
 
-    %options = odeset('RelTol', 1e-7, 'AbsTol', 1e-10);
+    %h = odeset('RelTol', 1e-7, 'AbsTol', 1e-10);
     h = 0.0001;
     if bc_method == "sat"
         [t, u] = odesolve(@(t, y) sbp_sat(t, y, D1, u0_func, invH_11), [0, tf], u_init, h);

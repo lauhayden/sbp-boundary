@@ -12,7 +12,7 @@ igauss_center = 0.25;
 bgauss_on = true;
 bgauss_sigma = 0.05;
 bgauss_center = -0.25;
-sbp_operator = @D1_6;
+sbp_operator = @D1_4;
 solver = @rk4_wrapper;
 %h = 0.0001;
 
@@ -40,6 +40,11 @@ e_ipm = cell(length(n), 1);
 enorm_sat = zeros(length(n), 1);
 enorm_proj = zeros(length(n), 1);
 enorm_ipm = zeros(length(n), 1);
+% labels for legend
+labels = cell(length(n), 1);
+for i=1:length(n)
+    labels(i) = {strcat("n = ", string(n(i)))};
+end
 
 % x-values
 x = cell(length(n), 1);
@@ -82,7 +87,7 @@ for i=1:length(n)
     
     % solve
     [t_sat_l, y_sat_l] = linadv_solve(solver, 'sat', n_l, tf, u_init_l, ...
-        sbp_operator, input_boundary_l, input_boundary_t_l, n_l); % TODO: CHECK SIGMA VAL
+        sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
     [t_proj_l, y_proj_l] = linadv_solve(solver, 'proj', n_l, tf, u_init_l, ...
         sbp_operator, input_boundary_l, input_boundary_t_l, n_l);
     [t_ipm_l, y_ipm_l] = linadv_solve(solver, 'ipm', n_l, tf, u_init_l, ...
@@ -151,30 +156,32 @@ xlabel('x')
 
 % plot error norms
 figure
-subplot(2, 2, 2)
 loglog(n, enorm_sat, 'o-')
-title('SBP-SAT Error')
+hold on
+loglog(n, enorm_proj, '+-')
+loglog(n, enorm_ipm, 'o--')
 ylabel('H-norm of error')
 xlabel('1/h')
-subplot(2, 2, 3)
-loglog(n, enorm_proj, 'o-')
-title('SBP-Proj Error')
-ylabel('H-norm of error')
-xlabel('1/h')
-subplot(2, 2, 4)
-loglog(n, enorm_ipm, 'o-')
-title('SBP-IPM Error')
-ylabel('H-norm of error')
-xlabel('1/h')
+legend('SBP-SAT', 'SBP-Projection', 'SBP-IPM')
 
-% plot exact solution overlaid
+% % plot exact solution overlaid
 % figure
 % hold on
 % plot(x{4}, solution{4}, 'o')
-% plot(x{4}, u_sat{4}(end, :)', 'o')
-% legend('exact', 'sat4')
+% plot(x{4}, u_proj{4}(end, :)', 'o')
+% legend('exact', 'proj4')
 
 % plot errors
+figure
+hold on
+for i=1:length(n)
+    plot(x{i}, solution{i} - u_proj{i}(end, :)')
+end
+title('Error at tf')
+ylabel('u\_exact - u\_sbp\_proj')
+xlabel('x')
+legend(labels, 'Location', 'north')
+
 figure
 hold on
 for i=1:length(n)
@@ -183,22 +190,18 @@ end
 title('Error at tf')
 ylabel('u\_exact - u\_sbp\_sat')
 xlabel('x')
+legend(labels, 'Location', 'north')
 
-% figure
-% hold on
-% for i=1:length(n)
-%     plot(x{i}, solution{i} - u_proj{i}(end, :)')
-% end
-% title('Error at tf')
-% ylabel('u\_exact - u\_sbp\_proj')
-% xlabel('x')
+figure
+hold on
+for i=1:length(n)
+    plot(x{i}, solution{i} - u_ipm{i}(end, :)')
+end
+title('Error at tf')
+ylabel('u\_exact - u\_sbp\_ipm')
+xlabel('x')
+legend(labels, 'Location', 'north')
 
-% plot boundary overlaid with exact
-% t_boundary = linspace(0, 0.5, 501);
-% y_boundary = input_boundary(t_boundary, true, bgauss_center, bgauss_sigma);
-% figure
-% hold on
-% plot(x{4}(1:501), solution{4}(1:501) - y_boundary')
 
 %% Inline functions
 
